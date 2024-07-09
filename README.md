@@ -41,12 +41,13 @@ o.component('home-page', HomePage);
 o.route('/', 'home-page');
 
 o.mount();
+```
 
-<h2>Documentation</h2>
+### Documentation
 For detailed documentation, examples, and more information, please visit the o.js Documentation.
 
-<h2>Contributing</h2>
+### Contributing
 We welcome contributions to the o.js framework! If you have any ideas, bug reports, or pull requests, please feel free to submit them on the GitHub repository.
 
-<h2>License</h2>
+### License
 o.js is released under the MIT License.
