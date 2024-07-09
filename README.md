@@ -1,7 +1,7 @@
 # o-js-Framework
 o.js - A lightweight and modular JavaScript framework for building dynamic web applications. Designed with a focus on simplicity, flexibility, and performance.
 
-#o.js - Lightweight JavaScript Framework
+<h2>o.js - Lightweight JavaScript Framework</h2>
 o.js is a minimalist JavaScript framework that empowers developers to build dynamic and responsive web applications with ease. Designed with a focus on simplicity, flexibility, and performance, o.js provides a straightforward approach to component-based development, routing, and data management.
 
 #Features
