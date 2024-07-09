@@ -4,17 +4,17 @@ o.js - A lightweight and modular JavaScript framework for building dynamic web a
 <h2>o.js - Lightweight JavaScript Framework</h2>
 o.js is a minimalist JavaScript framework that empowers developers to build dynamic and responsive web applications with ease. Designed with a focus on simplicity, flexibility, and performance, o.js provides a straightforward approach to component-based development, routing, and data management.
 
-#Features
+<h2>Features</h2>
 Component-based Architecture: Easily create and manage reusable UI components with a clear separation of concerns.
 Efficient Routing: Implement client-side routing with a simple and intuitive API.
 Data Management: Manage application-wide data with a centralized data store.
 Lightweight and Modular: The core framework is lightweight, allowing you to build applications without unnecessary overhead.
 Extensible: Customize and extend the framework to fit your specific needs.
 
-#Getting Started
+<h2>Getting Started</h2>
 Include the o.js file in your HTML:
 
-#Usage
+<h2>Usage</h2>
 html
 <script src="https://cdn.jsdelivr.net/npm/o.js"></script>
 Create your first component:
@@ -36,11 +36,11 @@ o.route('/', 'home-page');
 
 o.mount();
 
-#Documentation
+<h2>Documentation</h2>
 For detailed documentation, examples, and more information, please visit the o.js Documentation.
 
-#Contributing
+<h2>Contributing</h2>
 We welcome contributions to the o.js framework! If you have any ideas, bug reports, or pull requests, please feel free to submit them on the GitHub repository.
 
-#License
+<h2>License</h2>
 o.js is released under the MIT License.
