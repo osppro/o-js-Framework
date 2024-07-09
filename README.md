@@ -50,4 +50,4 @@ For detailed documentation, examples, and more information, please visit the o.j
 We welcome contributions to the o.js framework! If you have any ideas, bug reports, or pull requests, please feel free to submit them on the GitHub repository.
 
 ### License
-o.js is released under the ### MIT License.
+o.js is released under the  <b>MIT License</b>.
