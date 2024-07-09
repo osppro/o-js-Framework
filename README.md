@@ -17,10 +17,10 @@ o.js is a minimalist JavaScript framework that empowers developers to build dyna
 
 ### Installation
 
-Include the o.js file in your HTML:
+Include the `o.js` file in your HTML:
 
 <h2>Usage</h2>
-html
+```html
 <script src="https://cdn.jsdelivr.net/npm/o.js"></script>
 Create your first component:
 
@@ -32,7 +32,7 @@ class HomePage extends OComponent {
     `;
   }
 }
-
+ ```
 Define your routes and mount the application:
 const o = new O();
 
