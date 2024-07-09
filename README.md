@@ -17,7 +17,6 @@ o.js is a minimalist JavaScript framework that empowers developers to build dyna
 
 ### Installation
 
-<h2>Getting Started</h2>
 Include the o.js file in your HTML:
 
 <h2>Usage</h2>
