@@ -19,9 +19,9 @@ o.js is a minimalist JavaScript framework that empowers developers to build dyna
 
 Include the `o.js` file in your HTML:
 
-<h2>Usage</h2>
+### Usage
 
-html
+```html
 <script src="https://cdn.jsdelivr.net/npm/o.js"></script>
 Create your first component:
 
