@@ -55,39 +55,23 @@ class OComponent {
 
   template(data) {
     return `
-      <h1>\${data.title}</h1>
-      <p>\${data.content}</p>
+      <h1>${data.title}</h1>
+      <p>${data.content}</p>
     `;
-  }
-
-  // New: Lifecycle Hooks
-  beforeMount() {}
-  mounted() {}
-  beforeUpdate() {}
-  updated() {}
-  beforeUnmount() {}
-  unmounted() {}
-
-  // New: Computed Properties
-  computed(data) {
-    return {
-      // Define computed properties here
-    };
   }
 }
 
 class ORouter {
-  constructor() {
+  constructor(basePath = '/') {
     this.routes = {};
     this.currentRoute = null;
     this.onRouteChange = null;
-    this.basePath = '/o-js-Framework';
+    this.basePath = basePath;
     this.defaultRoute = null;
-    this.events = {};
   }
 
-  route(path, componentName) {
-    this.routes[path] = componentName;
+  route(fullPath, componentName) {
+    this.routes[this.basePath + fullPath] = componentName;
   }
 
   setDefaultRoute(componentName) {
@@ -95,8 +79,9 @@ class ORouter {
   }
 
   navigate(path) {
-    if (this.routes[path]) {
-      this.currentRoute = this.routes[path];
+    const fullPath = this.basePath + path;
+    if (this.routes[fullPath]) {
+      this.currentRoute = this.routes[fullPath];
       this.renderComponent();
       this.updateURL(path);
     } else if (this.defaultRoute) {
@@ -111,8 +96,8 @@ class ORouter {
   renderComponent() {
     const componentName = this.currentRoute;
     const componentElement = document.getElementById('app');
-    const componentClass = o.components[componentName];
-    const component = new componentClass(componentElement, {});
+    const componentClass = window.O.components[componentName];
+    const component = new componentClass(componentElement, window.O.data);
     component.render();
   }
 
@@ -122,70 +107,12 @@ class ORouter {
       url.pathname = this.basePath + path;
       window.history.pushState({}, '', url.toString());
     } catch (error) {
-      console.error('Error updating URL:', error);
-      // Fallback logic, e.g., navigate to the default route
-      this.navigate(this.defaultRoute);
+      console.error('Error updating URL:', e);
     }
   }
-
-  // updateURL(path) {
-  //   try {
-  //     window.history.pushState({}, '', path);
-  //   } catch (error) {
-  //     console.error('Error updating URL:', error);
-  //     // Fallback logic, e.g., navigate to the default route
-  //     this.navigate(this.defaultRoute);
-  //   }
-  // }
-
-
-   // updateURL(path) {
-   //    const fullPath = this.basePath + path;
-   //    window.history.pushState({}, '', path);
-   //  }
 
   handleNotFound() {
     console.error('404 - Page not found');
-    this.trigger('404');
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
-  }
-
-  trigger(event, ...args) {
-    if (this.events[event]) {
-      this.events[event].forEach(callback => callback(...args));
-    }
-  }
-
-
-  // New: Route Parameters
-  getRouteParams(path) {
-    const routes = Object.keys(this.routes);
-    for (const route of routes) {
-      const regex = this.getRouteRegex(route);
-      const match = path.match(regex);
-      if (match) {
-        const params = {};
-        match.slice(1).forEach((value, index) => {
-          params[this.getParamName(route, index)] = value;
-        });
-        return params;
-      }
-    }
-    return {};
-  }
-
-  getRouteRegex(route) {
-    return new RegExp('^' + route.replace(/:\w+/g, '(\\w+)') + '$');
-  }
-
-  getParamName(route, index) {
-    return route.split('/').filter(part => part.startsWith(':'))[index].slice(1);
   }
 }
 
@@ -195,7 +122,6 @@ class O {
     this.data = {};
     this.router = new ORouter();
     this.directives = {};
-    this.state = {};
   }
 
   component(name, componentClass) {
@@ -207,7 +133,6 @@ class O {
   }
 
   route(path, componentName) {
-    // this.router.route(this.config.baseUrl + path, componentName);
     this.router.route(path, componentName);
   }
 
@@ -215,45 +140,17 @@ class O {
     this.router.setDefaultRoute(componentName);
   }
 
-  navigate(path) {
-    this.router.navigate(path);
+  navigate(fullPath) {
+    this.router.navigate(fullPath);
   }
 
-  // New: Directives
   directive(name, directive) {
     this.directives[name] = directive;
-    this.applyDirectives();
-  }
-
-  applyDirectives() {
-    for (const [name, directive] of Object.entries(this.directives)) {
-      const elements = document.querySelectorAll(`[${name}]`);
-      elements.forEach(element => {
-        directive(element, this);
-      });
-    }
   }
 
   mount(callback) {
     this.router.navigate(window.location.pathname);
     callback();
-  }
-  // mount(callback) {
-  //   document.addEventListener('DOMContentLoaded', () => {
-  //     callback();
-  //   });
-  // }
-
-  // New: Global State Management
-  setState(newState) {
-    this.state = { ...this.state, ...newState };
-    this.updateComponents();
-  }
-
-  updateComponents() {
-    Object.values(this.components).forEach(component => {
-      component.update();
-    });
   }
 
   // Server-Side Rendering (SSR)
@@ -276,4 +173,4 @@ class O {
   }
 }
 
-const o = new O();
+window.O = o;

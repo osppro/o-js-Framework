@@ -3,51 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>O.js Framework</title>
+  <title>o.js Routing Example</title>
 </head>
 <body>
+  <nav>
+    <a href="#" onclick="o.navigate('/')">Home</a>
+    <a href="#" onclick="o.navigate('/about')">About</a>
+    <a href="#" onclick="o.navigate('/contact')">Contact</a>
+  </nav>
+
   <div id="app"></div>
 
-  <!-- <script src="./o.js"></script> -->
+  <script src="o.js"></script>
   <script>
-    import {OComponent, ORouter, O} from './o.js';
-
+    // HomeComponent.js
     class HomeComponent extends OComponent {
       template(data) {
         return `
-          <h1>\[data.title]</h1>
-          <p>\[data.content]</p>
-          <a href="#" onclick="o.navigate('/about')">Go to About</a>
+          <h1>Welcome to the Home Page</h1>
+          <p>This is the home page content.</p>
         `;
       }
     }
 
+    // AboutComponent.js
     class AboutComponent extends OComponent {
       template(data) {
         return `
-          <h1>\[data.title]</h1>
-          <p>\[data.content]</p>
-          <a href="#" onclick="o.navigate('/')">Go to Home</a>
+          <h1>About Us</h1>
+          <p>This is the about page content.</p>
         `;
       }
     }
 
-    const o = new O('/o-js-Framework');
+    // ContactComponent.js
+    class ContactComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>Contact Us</h1>
+          <p>This is the contact page content.</p>
+        `;
+      }
+    }
 
     o.component('HomeComponent', HomeComponent);
     o.component('AboutComponent', AboutComponent);
+    o.component('ContactComponent', ContactComponent);
 
     o.route('/', 'HomeComponent');
     o.route('/about', 'AboutComponent');
-    o.setDefaultRoute('HomeComponent');
-
-    o.data({
-      title: 'Welcome to O.js',
-      content: 'This is the home page.'
-    });
+    o.route('/contact', 'ContactComponent');
 
     o.mount(() => {
-      console.log('Application mounted');
+      o.navigate('/');
     });
   </script>
 </body>
