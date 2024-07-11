@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>o.js Routing Example</title>
+</head>
+<body>
+  <nav>
+    <a href="#" onclick="o.navigate('/')">Home</a>
+    <a href="#" onclick="o.navigate('/about')">About</a>
+    <a href="#" onclick="o.navigate('/contact')">Contact</a>
+  </nav>
+
+  <div id="app"></div>
+
+  <script src="o.js"></script>
+  <script>
+    // HomeComponent.js
+    class HomeComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>Welcome to the Home Page</h1>
+          <p>This is the home page content.</p>
+        `;
+      }
+    }
+
+    // AboutComponent.js
+    class AboutComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>About Us</h1>
+          <p>This is the about page content.</p>
+        `;
+      }
+    }
+
+    // ContactComponent.js
+    class ContactComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>Contact Us</h1>
+          <p>This is the contact page content.</p>
+        `;
+      }
+    }
+
+    const o = new O();
+    o.component('HomeComponent', HomeComponent);
+    o.component('AboutComponent', AboutComponent);
+    o.component('ContactComponent', ContactComponent);
+
+    o.router.setDefaultRoute('HomeComponent');
+    o.router.route('/', 'HomeComponent');
+    o.router.route('/about', 'AboutComponent');
+    o.router.route('/contact', 'ContactComponent');
+
+    o.mount('app');
+  </script>
+</body>
+</html>

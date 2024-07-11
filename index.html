@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>o.js Data Fetching Example</title>
+  <script src="o.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    class PostsComponent extends OComponent {
+      constructor(props) {
+        super(props);
+        this.state = { posts: [] };
+      }
+
+      async componentDidMount() {
+        const response = await O.fetch('https://jsonplaceholder.typicode.com/posts');
+        const posts = await response.json();
+        this.setState({ posts });
+      }
+
+      render() {
+        this.element.innerHTML = `
+          <h1>Posts</h1>
+          <ul>
+            \[this.state.posts.map(post => `<li>\[post.title\]</li>`).join('')\]
+          </ul>
+        `;
+      }
+    }
+
+    const o = new O();
+    o.component('posts-component', PostsComponent);
+    o.route('/', 'posts-component');
+    o.mount('#app');
+  </script>
+</body>
+</html>
