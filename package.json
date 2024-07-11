@@ -1,0 +1,27 @@
+{
+  "name": "o-js-framework",
+  "version": "1.0.0",
+  "description": "o.js - A lightweight and modular JavaScript framework for building dynamic web applications. Designed with a focus on simplicity, flexibility, and performance.",
+  "main": "src/o.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "framework",
+    "web-development",
+    "frontend",
+    "lightweight",
+    "modular"
+  ],
+  "author": "Oguti David Brian <osp123ug@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osppro/o-js-framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/osppro/o-js-framework/issues"
+  },
+  "homepage": "https://github.com/osppro/o-js-framework#readme"
+}
