@@ -22,7 +22,7 @@ Include the `o.js` file in your HTML:
 ### Usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/o.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/o-js-framework"></script>
 Create your first component:
 // Create your first component
 class HomePage extends OComponent {
