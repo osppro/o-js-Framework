@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>o-js framework</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="o.js"></script>
+  <script type="text/javascript">
+    // Create your first component
+    class HomePage extends OComponent {
+      constructor(element, props) {
+        super(element, props);
+        this.data = {
+          title: "Welcome to KKK the Home Page",
+          content: "This is the content of the home page."
+        };
+      }
+
+      render() {
+        this.element.innerHTML = this.template(this.data);
+      }
+    }
+
+    // Define your routes and mount the application
+    const app = new O();
+
+    app.component('home-page', HomePage);
+    app.route('/', 'home-page');
+    app.setDefaultRoute('home-page');
+
+    app.mount(() => {
+      console.log('Application mounted!');
+    });
+  </script>
+</body>
+</html>

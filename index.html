@@ -10,8 +10,8 @@
 
   <script src="o.js"></script>
   <script type="text/javascript">
-    // Create your first component
-    class HomePage extends OComponent {
+    // Create your components
+    class oHomePage extends OComponent {
       constructor(element, props) {
         super(element, props);
         this.data = {
@@ -25,14 +25,47 @@
       }
     }
 
+    class oAboutPage extends OComponent {
+      constructor(element, props) {
+        super(element, props);
+        this.data = {
+          title: "About Page",
+          content: "This is the content of the about page."
+        };
+      }
+
+      render() {
+        this.element.innerHTML = this.template(this.data);
+      }
+    }
+
+    class o404Page extends OComponent {
+      constructor(element, props) {
+        super(element, props);
+        this.data = {
+          title: "404 - Page Not Found",
+          content: "The requested page could not be found."
+        };
+      }
+
+      render() {
+        this.element.innerHTML = this.template(this.data);
+      }
+    }
+
     // Define your routes and mount the application
-    const app = new O();
+    const o = new O();
 
-    app.component('home-page', HomePage);
-    app.route('/', 'home-page');
-    app.setDefaultRoute('home-page');
+    o.component('o-home-page', oHomePage);
+    o.component('o-about-page', oAboutPage);
+    o.component('o-404-page', o404Page);
 
-    app.mount(() => {
+    o.route('/', 'o-home-page');
+    o.route('/about', 'o-about-page');
+    o.route('/404', 'o-404-page');
+    o.setDefaultRoute('o-home-page');
+
+    o.mount(() => {
       console.log('Application mounted!');
     });
   </script>
