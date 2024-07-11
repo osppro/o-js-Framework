@@ -122,12 +122,23 @@ class ORouter {
     }
   }
 
+  // renderComponent() {
+  //   const componentName = this.currentRoute;
+  //   const componentElement = document.getElementById('app');
+  //   const componentClass = o.components[componentName];
+  //   const component = new componentClass(componentElement, {});
+  //   component.render();
+  // }
   renderComponent() {
     const componentName = this.currentRoute;
     const componentElement = document.getElementById('app');
     const componentClass = o.components[componentName];
-    const component = new componentClass(componentElement, {});
-    component.render();
+    if (componentClass) {
+      const component = new componentClass(componentElement, {});
+      component.render();
+    } else {
+      this.handleNotFound();
+    }
   }
 
   // updateURL(path) {
@@ -139,10 +150,22 @@ class ORouter {
   //     this.navigate(this.defaultRoute);
   //   }
   // }
+  // updateURL(path) {
+  //   const fullPath = this.basePath + path;
+  //   window.history.pushState({}, '', fullPath);
+  // }
+
   updateURL(path) {
+  try {
     const fullPath = this.basePath + path;
     window.history.pushState({}, '', fullPath);
+  } catch (error) {
+    console.error('Error updating URL:', error);
+    // Fallback logic, e.g., navigate to the default route
+    this.navigate(this.defaultRoute);
   }
+}
+
 
   handlePopState() {
     const currentPath = window.location.pathname.replace(this.basePath, '');
@@ -245,12 +268,20 @@ class O {
   //   this.router.navigate(window.location.pathname);
   //   callback();
   // }
+//   mount(callback) {
+//   this.router.navigate(window.location.pathname);
+//   if (typeof callback === 'function') {
+//     callback();
+//   }
+// }
+
   mount(callback) {
-  this.router.navigate(window.location.pathname);
-  if (typeof callback === 'function') {
-    callback();
+    this.router.navigate(window.location.pathname);
+    if (typeof callback === 'function') {
+      callback();
+    }
   }
-}
+
 
 
   // Global State Management

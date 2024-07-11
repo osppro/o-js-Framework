@@ -1,39 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>o.js Data Fetching Example</title>
-  <script src="o.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>o.js Routing Example</title>
 </head>
 <body>
+  <nav>
+    <a href="#" onclick="o.navigate('/')">Home</a>
+    <a href="#" onclick="o.navigate('/about')">About</a>
+    <a href="#" onclick="o.navigate('/contact')">Contact</a>
+  </nav>
+
   <div id="app"></div>
 
+  <script src="o.js"></script>
   <script>
-    class PostsComponent extends OComponent {
-      constructor(props) {
-        super(props);
-        this.state = { posts: [] };
-      }
-
-      async componentDidMount() {
-        const response = await O.fetch('https://jsonplaceholder.typicode.com/posts');
-        const posts = await response.json();
-        this.setState({ posts });
-      }
-
-      render() {
-        this.element.innerHTML = `
-          <h1>Posts</h1>
-          <ul>
-            \[this.state.posts.map(post => `<li>\[post.title\]</li>`).join('')\]
-          </ul>
+    // HomeComponent.js
+    class HomeComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>Welcome to the Home Page</h1>
+          <p>This is the home page content.</p>
         `;
       }
     }
 
-    const o = new O();
-    o.component('posts-component', PostsComponent);
-    o.route('/', 'posts-component');
-    o.mount('#app');
+    // AboutComponent.js
+    class AboutComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>About Us</h1>
+          <p>This is the about page content.</p>
+        `;
+      }
+    }
+
+    // ContactComponent.js
+    class ContactComponent extends OComponent {
+      template(data) {
+        return `
+          <h1>Contact Us</h1>
+          <p>This is the contact page content.</p>
+        `;
+      }
+    }
+
+    o.component('home-component', HomeComponent);
+    o.component('about-component', AboutComponent);
+    o.component('contact-component', ContactComponent);
+
+    o.route('/', 'home-component');
+    o.route('/about', 'about-component');
+    o.route('/contact', 'contact-component');
+
+    o.setDefaultRoute('home-component');
+
+    o.mount(() => {
+      o.navigate('/');
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>o.js Example</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="o.js"></script>
+  <script>
+    const HelloComponent = {
+      template(data) {
+        return `
+          <h1>Hello, ${data.name}!</h1>
+          <p>This is a simple example using the o.js framework.</p>
+        `;
+      },
+      mounted() {
+        console.log('HelloComponent mounted');
+      },
+      updated() {
+        console.log('HelloComponent updated');
+      }
+    };
+
+    o.component('hello-component', HelloComponent);
+    o.state.name = 'World';
+
+    o.mount(() => {
+      o.navigate('/');
+    });
+  </script>
+</body>
+</html>
