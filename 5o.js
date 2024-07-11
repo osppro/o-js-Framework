@@ -55,12 +55,12 @@ class OComponent {
 
   template(data) {
     return `
-      <h1>${data.title}</h1>
-      <p>${data.content}</p>
+      <h1>\${data.title}</h1>
+      <p>\${data.content}</p>
     `;
   }
 
-  // Lifecycle Hooks
+  // New: Lifecycle Hooks
   beforeMount() {}
   mounted() {}
   beforeUpdate() {}
@@ -68,7 +68,7 @@ class OComponent {
   beforeUnmount() {}
   unmounted() {}
 
-  // Computed Properties
+  // New: Computed Properties
   computed(data) {
     return {
       // Define computed properties here
@@ -89,18 +89,10 @@ class ORouter {
     window.addEventListener('popstate', () => {
       this.handlePopState();
     });
-
-    // Handle the initial URL
-    this.handleInitialURL();
-  }
-
-  handleInitialURL() {
-    const currentPath = window.location.pathname.replace(this.basePath, '');
-    this.navigate(currentPath || '/');
   }
 
   route(path, componentName) {
-    this.routes[this.basePath + path] = componentName;
+    this.routes[path] = componentName;
   }
 
   setDefaultRoute(componentName) {
@@ -109,8 +101,8 @@ class ORouter {
 
   navigate(path) {
     const fullPath = this.basePath + path;
-    if (this.routes[fullPath]) {
-      this.currentRoute = this.routes[fullPath];
+    if (this.routes[path]) {
+      this.currentRoute = this.routes[path];
       this.renderComponent();
       this.updateURL(path);
     } else if (this.defaultRoute) {
@@ -130,9 +122,26 @@ class ORouter {
     component.render();
   }
 
+  // updateURL(path) {
+  //   try {
+  //     let url = new URL(window.location.href);
+  //     url.pathname = this.basePath + path;
+  //     window.history.pushState({}, '', url.toString());
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
+
   updateURL(path) {
-    const fullPath = this.basePath + path;
-    window.history.pushState({}, '', fullPath);
+    try {
+      window.history.pushState({}, '', this.basePath + path);
+    } catch (error) {
+      console.error('Error updating URL:', error);
+      // Fallback logic, e.g., navigate to the default route
+      this.navigate(this.defaultRoute);
+    }
   }
 
   handlePopState() {
@@ -158,7 +167,8 @@ class ORouter {
     }
   }
 
-  // Route Parameters
+
+  // New: Route Parameters
   getRouteParams(path) {
     const routes = Object.keys(this.routes);
     for (const route of routes) {
@@ -202,20 +212,77 @@ class O {
   }
 
   data(key, value) {
-    if (typeof key === 'object') {
-      Object.entries(key).forEach(([k, v]) => {
-        this.data[k] = v;
+    this.data[key] = value;
+  }
+
+  route(path, componentName) {
+    // this.router.route(this.config.baseUrl + path, componentName);
+    this.router.route(path, componentName);
+  }
+
+  setDefaultRoute(componentName) {
+    this.router.setDefaultRoute(componentName);
+  }
+
+  navigate(path) {
+    this.router.navigate(path);
+  }
+
+  // New: Directives
+  directive(name, directive) {
+    this.directives[name] = directive;
+    this.applyDirectives();
+  }
+
+  applyDirectives() {
+    for (const [name, directive] of Object.entries(this.directives)) {
+      const elements = document.querySelectorAll(`[${name}]`);
+      elements.forEach(element => {
+        directive(element, this);
       });
-    } else {
-      this.data[key] = value;
     }
   }
 
-  directive(name, directive) {
-    this.directives[name] = directive;
+  mount(callback) {
+    this.router.navigate(window.location.pathname);
+    callback();
+  }
+  // mount(callback) {
+  //   document.addEventListener('DOMContentLoaded', () => {
+  //     callback();
+  //   });
+  // }
+
+  // New: Global State Management
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.updateComponents();
   }
 
-  mount(rootElement, options = {}) {
-    // This method is left empty, as it will be implemented in the HTML file
+  updateComponents() {
+    Object.values(this.components).forEach(component => {
+      component.update();
+    });
+  }
+
+  // Server-Side Rendering (SSR)
+  static renderToString(componentName, props) {
+    const componentClass = this.components[componentName];
+    const component = new componentClass(null, props);
+    return component.template(component.data);
+  }
+
+  // API Integration
+  static async fetch(url, options = {}) {
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
   }
 }
+
+const o = new O();

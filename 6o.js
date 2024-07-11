@@ -130,6 +130,15 @@ class ORouter {
     component.render();
   }
 
+  // updateURL(path) {
+  //   try {
+  //     window.history.pushState({}, '', this.basePath + path);
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
   updateURL(path) {
     const fullPath = this.basePath + path;
     window.history.pushState({}, '', fullPath);
@@ -202,20 +211,78 @@ class O {
   }
 
   data(key, value) {
-    if (typeof key === 'object') {
-      Object.entries(key).forEach(([k, v]) => {
-        this.data[k] = v;
+    this.data[key] = value;
+  }
+
+  route(path, componentName) {
+    this.router.route(path, componentName);
+  }
+
+  setDefaultRoute(componentName) {
+    this.router.setDefaultRoute(componentName);
+  }
+
+  navigate(path) {
+    this.router.navigate(path);
+  }
+
+  // Directives
+  directive(name, directive) {
+    this.directives[name] = directive;
+    this.applyDirectives();
+  }
+
+  applyDirectives() {
+    for (const [name, directive] of Object.entries(this.directives)) {
+      const elements = document.querySelectorAll(`[${name}]`);
+      elements.forEach(element => {
+        directive(element, this);
       });
-    } else {
-      this.data[key] = value;
     }
   }
 
-  directive(name, directive) {
-    this.directives[name] = directive;
-  }
-
-  mount(rootElement, options = {}) {
-    // This method is left empty, as it will be implemented in the HTML file
+  // mount(callback) {
+  //   this.router.navigate(window.location.pathname);
+  //   callback();
+  // }
+  mount(callback) {
+  this.router.navigate(window.location.pathname);
+  if (typeof callback === 'function') {
+    callback();
   }
 }
+
+
+  // Global State Management
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.updateComponents();
+  }
+
+  updateComponents() {
+    Object.values(this.components).forEach(component => {
+      component.update();
+    });
+  }
+
+  // Server-Side Rendering (SSR)
+  static renderToString(componentName, props) {
+    const componentClass = this.components[componentName];
+    const component = new componentClass(null, props);
+    return component.template(component.data);
+  }
+
+  // API Integration
+  static async fetch(url, options = {}) {
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
+}
+
+const o = new O();
