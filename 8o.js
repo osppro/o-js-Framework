@@ -90,7 +90,11 @@ class ORouter {
       this.handlePopState();
     });
 
-    
+  }
+
+  handlePopState() {
+    const currentPath = window.location.pathname.replace(this.basePath, '');
+    this.navigate(currentPath, true);
   }
 
   route(path, componentName) {
@@ -101,16 +105,20 @@ class ORouter {
     this.defaultRoute = componentName;
   }
 
-  navigate(path) {
+  navigate(path, skipPushState = false) {
     const fullPath = this.basePath + path;
     if (this.routes[path]) {
       this.currentRoute = this.routes[path];
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else if (this.defaultRoute) {
       this.currentRoute = this.defaultRoute;
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else {
       this.handleNotFound();
     }
@@ -253,15 +261,25 @@ class O {
     }
   }
 
+  // mount(callback) {
+  //   this.router.navigate(window.location.pathname);
+  //   callback();
+  // }
   mount(callback) {
+  // Check if the application has been pre-rendered on the server
+  const isServerRendered = document.getElementById('app').hasAttribute('data-server-rendered');
+
+  if (isServerRendered) {
+    // Hydrate the pre-rendered content
+    this.router.navigate(window.location.pathname);
+    callback();
+  } else {
+    // Render the application from scratch
     this.router.navigate(window.location.pathname);
     callback();
   }
-  // mount(callback) {
-  //   document.addEventListener('DOMContentLoaded', () => {
-  //     callback();
-  //   });
-  // }
+}
+
 
   // New: Global State Management
   setState(newState) {

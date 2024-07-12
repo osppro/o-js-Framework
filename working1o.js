@@ -55,8 +55,8 @@ class OComponent {
 
   template(data) {
     return `
-      <h1>\${data.title}</h1>
-      <p>\${data.content}</p>
+      <h1>${data.title}</h1>
+      <p>${data.content}</p>
     `;
   }
 
@@ -89,7 +89,11 @@ class ORouter {
     window.addEventListener('popstate', () => {
       this.handlePopState();
     });
+  }
 
+  handlePopState() {
+    const currentPath = window.location.pathname.replace(this.basePath, '');
+    this.navigate(currentPath, true);
   }
 
   route(path, componentName) {
@@ -100,16 +104,20 @@ class ORouter {
     this.defaultRoute = componentName;
   }
 
-  navigate(path) {
+  navigate(path, skipPushState = false) {
     const fullPath = this.basePath + path;
     if (this.routes[path]) {
       this.currentRoute = this.routes[path];
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else if (this.defaultRoute) {
       this.currentRoute = this.defaultRoute;
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else {
       this.handleNotFound();
     }
@@ -123,42 +131,14 @@ class ORouter {
     component.render();
   }
 
-  // updateURL(path) {
-  //   try {
-  //     let url = new URL(window.location.href);
-  //     url.pathname = this.basePath + path;
-  //     window.history.pushState({}, '', url.toString());
-  //   } catch (error) {
-  //     console.error('Error updating URL:', error);
-  //     // Fallback logic, e.g., navigate to the default route
-  //     this.navigate(this.defaultRoute);
-  //   }
-  // }
-
-  // updateURL(path) {
-  //   try {
-  //     window.history.pushState({}, '', this.basePath + path);
-  //   } catch (error) {
-  //     console.error('Error updating URL:', error);
-  //     // Fallback logic, e.g., navigate to the default route
-  //     this.navigate(this.defaultRoute);
-  //   }
-  // }
-
   updateURL(path) {
     try {
-      const fullPath = this.basePath + path;
-      window.history.replaceState({}, '', fullPath);
+      window.history.replaceState({}, '', this.basePath + path);
     } catch (error) {
       console.error('Error updating URL:', error);
       // Fallback logic, e.g., navigate to the default route
       this.navigate(this.defaultRoute);
     }
-  }
-
-  handlePopState() {
-    const currentPath = window.location.pathname.replace(this.basePath, '');
-    this.navigate(currentPath);
   }
 
   handleNotFound() {
@@ -178,7 +158,6 @@ class ORouter {
       this.events[event].forEach(callback => callback(...args));
     }
   }
-
 
   // New: Route Parameters
   getRouteParams(path) {
@@ -225,7 +204,6 @@ class O {
   }
 
   route(path, componentName) {
-    // this.router.route(this.config.baseUrl + path, componentName);
     this.router.route(path, componentName);
   }
 
@@ -252,25 +230,10 @@ class O {
     }
   }
 
-  // mount(callback) {
-  //   this.router.navigate(window.location.pathname);
-  //   callback();
-  // }
   mount(callback) {
-  // Check if the application has been pre-rendered on the server
-  const isServerRendered = document.getElementById('app').hasAttribute('data-server-rendered');
-
-  if (isServerRendered) {
-    // Hydrate the pre-rendered content
-    this.router.navigate(window.location.pathname);
-    callback();
-  } else {
-    // Render the application from scratch
     this.router.navigate(window.location.pathname);
     callback();
   }
-}
-
 
   // New: Global State Management
   setState(newState) {
