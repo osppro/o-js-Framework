@@ -55,8 +55,8 @@ class OComponent {
 
   template(data) {
     return `
-      <h1>${data.title}</h1>
-      <p>${data.content}</p>
+      <h1>\${data.title}</h1>
+      <p>\${data.content}</p>
     `;
   }
 
@@ -84,17 +84,13 @@ class ORouter {
     this.onRouteChange = null;
     this.defaultRoute = null;
     this.events = {};
-    this.middleware = [];
 
     // Add an event listener for the popstate event
     window.addEventListener('popstate', () => {
       this.handlePopState();
     });
-  }
 
-  handlePopState() {
-    const currentPath = window.location.pathname.replace(this.basePath, '');
-    this.navigate(currentPath, true);
+    
   }
 
   route(path, componentName) {
@@ -105,24 +101,16 @@ class ORouter {
     this.defaultRoute = componentName;
   }
 
-  navigate(path, skipPushState = false) {
+  navigate(path) {
     const fullPath = this.basePath + path;
     if (this.routes[path]) {
       this.currentRoute = this.routes[path];
-      this.runMiddleware('before', path);
       this.renderComponent();
-      this.runMiddleware('after', path);
-      if (!skipPushState) {
-        this.updateURL(path);
-      }
+      this.updateURL(path);
     } else if (this.defaultRoute) {
       this.currentRoute = this.defaultRoute;
-      this.runMiddleware('before', path);
       this.renderComponent();
-      this.runMiddleware('after', path);
-      if (!skipPushState) {
-        this.updateURL(path);
-      }
+      this.updateURL(path);
     } else {
       this.handleNotFound();
     }
@@ -136,14 +124,42 @@ class ORouter {
     component.render();
   }
 
+  // updateURL(path) {
+  //   try {
+  //     let url = new URL(window.location.href);
+  //     url.pathname = this.basePath + path;
+  //     window.history.pushState({}, '', url.toString());
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
+
+  // updateURL(path) {
+  //   try {
+  //     window.history.pushState({}, '', this.basePath + path);
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
+
   updateURL(path) {
     try {
-      window.history.replaceState({}, '', this.basePath + path);
+      const fullPath = this.basePath + path;
+      window.history.replaceState({}, '', fullPath);
     } catch (error) {
       console.error('Error updating URL:', error);
       // Fallback logic, e.g., navigate to the default route
       this.navigate(this.defaultRoute);
     }
+  }
+
+  handlePopState() {
+    const currentPath = window.location.pathname.replace(this.basePath, '');
+    this.navigate(currentPath);
   }
 
   handleNotFound() {
@@ -163,6 +179,7 @@ class ORouter {
       this.events[event].forEach(callback => callback(...args));
     }
   }
+
 
   // New: Route Parameters
   getRouteParams(path) {
@@ -188,38 +205,16 @@ class ORouter {
   getParamName(route, index) {
     return route.split('/').filter(part => part.startsWith(':'))[index].slice(1);
   }
-
-  // New: Middleware
-  use(middleware) {
-    this.middleware.push(middleware);
-  }
-
-  runMiddleware(type, path) {
-    this.middleware.forEach(middleware => {
-      if (typeof middleware[type] === 'function') {
-        middleware[type](path, this);
-      }
-    });
-  }
 }
 
 class O {
   constructor(config = {}) {
-    this.config = { baseUrl: this.getBaseUrl(), ...config };
+    this.config = { baseUrl: '/o-js-Framework', ...config };
     this.components = {};
     this.data = {};
     this.router = new ORouter(this.config.baseUrl);
     this.directives = {};
     this.state = {};
-    this.plugins = [];
-  }
-
-  getBaseUrl() {
-    // Determine the base URL based on the current URL
-    const currentUrl = new URL(window.location.href);
-    const pathParts = currentUrl.pathname.split('/').filter(part => part !== '');
-    const baseUrl = '/' + pathParts.slice(0, -1).join('/');
-    return baseUrl;
   }
 
   component(name, componentClass) {
@@ -231,6 +226,7 @@ class O {
   }
 
   route(path, componentName) {
+    // this.router.route(this.config.baseUrl + path, componentName);
     this.router.route(path, componentName);
   }
 
@@ -261,6 +257,11 @@ class O {
     this.router.navigate(window.location.pathname);
     callback();
   }
+  // mount(callback) {
+  //   document.addEventListener('DOMContentLoaded', () => {
+  //     callback();
+  //   });
+  // }
 
   // New: Global State Management
   setState(newState) {
@@ -291,55 +292,6 @@ class O {
       console.error('Error fetching data:', error);
       throw error;
     }
-  }
-
-  // New: Nested Routing
-  registerNestedRoute(parentPath, childPath, componentName) {
-    const fullPath = `${parentPath}/${childPath}`;
-    this.router.route(fullPath, componentName);
-  }
-
-  renderNestedComponent(parentElement, componentName, props) {
-    const componentClass = this.components[componentName];
-    const component = new componentClass(parentElement, props);
-    component.render();
-  }
-
-  // New: Middleware
-  use(middleware) {
-    this.router.use(middleware);
-  }
-
-  // New: Plugins
-  use(plugin) {
-    this.plugins.push(plugin);
-    plugin.install(this);
-  }
-
-  // New: Dynamic Imports
-  async loadComponent(componentName) {
-    const componentClass = await import(`./components/${componentName}.js`).then(module => module.default);
-    this.components[componentName] = componentClass;
-    return componentClass;
-  }
-
-  // New: Dependency Injection
-  register(serviceName, service) {
-    this[serviceName] = service;
-  }
-
-  get(serviceName) {
-    return this[serviceName];
-  }
-
-  // New: Error Handling
-  handleError(error) {
-    console.error('Global error:', error);
-    this.plugins.forEach(plugin => {
-      if (typeof plugin.onError === 'function') {
-        plugin.onError(error);
-      }
-    });
   }
 }
 

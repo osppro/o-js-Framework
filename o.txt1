@@ -1,0 +1,31 @@
+Nested Routing:
+
+Added registerNestedRoute() and renderNestedComponent() methods to the O class to handle nested routes and components.
+Middleware:
+
+Introduced a middleware system in the ORouter class, including use() and runMiddleware() methods.
+Middleware functions can be registered to be executed before or after a route is handled.
+Dynamic Imports:
+
+Added a loadComponent() method to the O class to support dynamic imports of components.
+Dependency Injection:
+
+Introduced register() and get() methods in the O class to handle dependency registration and injection.
+Error Handling:
+
+Added a handleError() method in the O class to centralize error handling.
+Plugins can now register an onError() method to handle global errors.
+Lifecycle Hooks:
+
+Expanded the lifecycle hooks in the OComponent class to include beforeDestroy and destroyed.
+Plugins:
+
+Introduced a plugin system in the O class, including a use() method to register plugins.
+Plugins can now extend the functionality of the framework.
+Server-Side Rendering (SSR) Improvements:
+
+Updated the renderToString() method in the O class to handle nested components and dynamic imports.
+Testing:
+
+No specific implementation provided, but you can consider using a testing framework like Jest or Mocha to write unit and integration tests for the o.js framework.
+Documentation and Examples:
