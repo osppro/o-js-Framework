@@ -90,6 +90,7 @@ class ORouter {
       this.handlePopState();
     });
 
+    
   }
 
   route(path, componentName) {
@@ -252,25 +253,15 @@ class O {
     }
   }
 
-  // mount(callback) {
-  //   this.router.navigate(window.location.pathname);
-  //   callback();
-  // }
   mount(callback) {
-  // Check if the application has been pre-rendered on the server
-  const isServerRendered = document.getElementById('app').hasAttribute('data-server-rendered');
-
-  if (isServerRendered) {
-    // Hydrate the pre-rendered content
-    this.router.navigate(window.location.pathname);
-    callback();
-  } else {
-    // Render the application from scratch
     this.router.navigate(window.location.pathname);
     callback();
   }
-}
-
+  // mount(callback) {
+  //   document.addEventListener('DOMContentLoaded', () => {
+  //     callback();
+  //   });
+  // }
 
   // New: Global State Management
   setState(newState) {
