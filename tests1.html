@@ -8,9 +8,9 @@
 </head>
 <body>
   <nav class="card">
-    <a href="#" onclick="o.navigate('/')">Home</a>
-    <a href="#" onclick="o.navigate('/about')">About</a>
-    <a href="#" onclick="o.navigate('/contact')">Contact</a>
+    <a href="#" id="home-link">Home</a>
+    <a href="#" id="about-link">About</a>
+    <a href="#" id="contact-link">Contact</a>
   </nav>
 
   <div id="app"></div>
@@ -56,6 +56,21 @@
     o.route('/contact', 'contact-component');
 
     o.setDefaultRoute('home-component');
+
+    document.getElementById('home-link').addEventListener('click', (event) => {
+      event.preventDefault();
+      o.navigate('/');
+    });
+
+    document.getElementById('about-link').addEventListener('click', (event) => {
+      event.preventDefault();
+      o.navigate('/about');
+    });
+
+    document.getElementById('contact-link').addEventListener('click', (event) => {
+      event.preventDefault();
+      o.navigate('/contact');
+    });
 
     o.mount(() => {
       o.navigate('/');

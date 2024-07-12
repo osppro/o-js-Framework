@@ -55,12 +55,12 @@ class OComponent {
 
   template(data) {
     return `
-      <h1>${data.title}</h1>
-      <p>${data.content}</p>
+      <h1>\${data.title}</h1>
+      <p>\${data.content}</p>
     `;
   }
 
-  // Lifecycle Hooks
+  // New: Lifecycle Hooks
   beforeMount() {}
   mounted() {}
   beforeUpdate() {}
@@ -68,7 +68,7 @@ class OComponent {
   beforeUnmount() {}
   unmounted() {}
 
-  // Computed Properties
+  // New: Computed Properties
   computed(data) {
     return {
       // Define computed properties here
@@ -90,17 +90,10 @@ class ORouter {
       this.handlePopState();
     });
 
-    // Handle the initial URL
-    this.handleInitialURL();
-  }
-
-  handleInitialURL() {
-    const currentPath = window.location.pathname.replace(this.basePath, '');
-    this.navigate(currentPath || '/');
   }
 
   route(path, componentName) {
-    this.routes[this.basePath + path] = componentName;
+    this.routes[path] = componentName;
   }
 
   setDefaultRoute(componentName) {
@@ -109,8 +102,8 @@ class ORouter {
 
   navigate(path) {
     const fullPath = this.basePath + path;
-    if (this.routes[fullPath]) {
-      this.currentRoute = this.routes[fullPath];
+    if (this.routes[path]) {
+      this.currentRoute = this.routes[path];
       this.renderComponent();
       this.updateURL(path);
     } else if (this.defaultRoute) {
@@ -126,24 +119,42 @@ class ORouter {
     const componentName = this.currentRoute;
     const componentElement = document.getElementById('app');
     const componentClass = o.components[componentName];
-    if (componentClass) {
-      const component = new componentClass(componentElement, {});
-      component.render();
-    } else {
-      this.handleNotFound();
-    }
+    const component = new componentClass(componentElement, {});
+    component.render();
   }
 
   updateURL(path) {
     try {
-      const fullPath = this.basePath + path;
-      window.history.pushState({}, '', fullPath);
+      let url = new URL(window.location.href);
+      url.pathname = this.basePath + path;
+      window.history.pushState({}, '', url.toString());
     } catch (error) {
       console.error('Error updating URL:', error);
       // Fallback logic, e.g., navigate to the default route
       this.navigate(this.defaultRoute);
     }
   }
+
+  // updateURL(path) {
+  //   try {
+  //     window.history.pushState({}, '', this.basePath + path);
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
+
+  // updateURL(path) {
+  //   try {
+  //     const fullPath = this.basePath + path;
+  //     window.history.replaceState({}, '', fullPath);
+  //   } catch (error) {
+  //     console.error('Error updating URL:', error);
+  //     // Fallback logic, e.g., navigate to the default route
+  //     this.navigate(this.defaultRoute);
+  //   }
+  // }
 
   handlePopState() {
     const currentPath = window.location.pathname.replace(this.basePath, '');
@@ -167,39 +178,43 @@ class ORouter {
       this.events[event].forEach(callback => callback(...args));
     }
   }
+
+
+  // New: Route Parameters
+  getRouteParams(path) {
+    const routes = Object.keys(this.routes);
+    for (const route of routes) {
+      const regex = this.getRouteRegex(route);
+      const match = path.match(regex);
+      if (match) {
+        const params = {};
+        match.slice(1).forEach((value, index) => {
+          params[this.getParamName(route, index)] = value;
+        });
+        return params;
+      }
+    }
+    return {};
+  }
+
+  getRouteRegex(route) {
+    return new RegExp('^' + route.replace(/:\w+/g, '(\\w+)') + '$');
+  }
+
+  getParamName(route, index) {
+    return route.split('/').filter(part => part.startsWith(':'))[index].slice(1);
+  }
 }
 
 class O {
   constructor(config = {}) {
-    this.config = {
-      baseUrl: this.getBaseUrl(),
-      ...config
-    };
+    this.config = { baseUrl: '/o-js-Framework', ...config };
     this.components = {};
     this.data = {};
     this.router = new ORouter(this.config.baseUrl);
     this.directives = {};
     this.state = {};
   }
-
-  getBaseUrl() {
-    // Determine the base URL dynamically
-    const scriptUrl = this.getScriptUrl();
-    const baseUrl = new URL(scriptUrl).pathname.replace(/\/[^/]+$/, '');
-    return baseUrl;
-  }
-
-   getScriptUrl() {
-    // Get the URL of the current script
-    const scripts = document.getElementsByTagName('script');
-    for (let i = 0; i < scripts.length; i++) {
-      if (scripts[i].src.includes('o.js')) {
-        return scripts[i].src;
-      }
-    }
-    return '';
-  }
-
 
   component(name, componentClass) {
     this.components[name] = componentClass;
@@ -210,6 +225,7 @@ class O {
   }
 
   route(path, componentName) {
+    // this.router.route(this.config.baseUrl + path, componentName);
     this.router.route(path, componentName);
   }
 
@@ -221,7 +237,7 @@ class O {
     this.router.navigate(path);
   }
 
-  // Directives
+  // New: Directives
   directive(name, directive) {
     this.directives[name] = directive;
     this.applyDirectives();
@@ -236,13 +252,27 @@ class O {
     }
   }
 
+  // mount(callback) {
+  //   this.router.navigate(window.location.pathname);
+  //   callback();
+  // }
   mount(callback) {
-    this.router.navigate(window.location.pathname);
-    if (typeof callback === 'function') {
-      callback();
-    }
-  }
+  // Check if the application has been pre-rendered on the server
+  const isServerRendered = document.getElementById('app').hasAttribute('data-server-rendered');
 
+  if (isServerRendered) {
+    // Hydrate the pre-rendered content
+    this.router.navigate(window.location.pathname);
+    callback();
+  } else {
+    // Render the application from scratch
+    this.router.navigate(window.location.pathname);
+    callback();
+  }
+}
+
+
+  // New: Global State Management
   setState(newState) {
     this.state = { ...this.state, ...newState };
     this.updateComponents();

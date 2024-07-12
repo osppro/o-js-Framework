@@ -92,6 +92,11 @@ class ORouter {
 
   }
 
+  handlePopState() {
+    const currentPath = window.location.pathname.replace(this.basePath, '');
+    this.navigate(currentPath, true);
+  }
+
   route(path, componentName) {
     this.routes[path] = componentName;
   }
@@ -100,16 +105,20 @@ class ORouter {
     this.defaultRoute = componentName;
   }
 
-  navigate(path) {
+  navigate(path, skipPushState = false) {
     const fullPath = this.basePath + path;
     if (this.routes[path]) {
       this.currentRoute = this.routes[path];
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else if (this.defaultRoute) {
       this.currentRoute = this.defaultRoute;
       this.renderComponent();
-      this.updateURL(path);
+      if (!skipPushState) {
+        this.updateURL(path);
+      }
     } else {
       this.handleNotFound();
     }
