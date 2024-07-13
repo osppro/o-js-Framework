@@ -3,54 +3,20 @@ class OComponent {
     this.element = element;
     this.props = props;
     this.data = {};
-    this.events = {};
     this.state = {};
-    this.mounted = false;
   }
 
   render() {
-    const html = this.template(this.data);
-    this.element.innerHTML = html;
+    this.element.innerHTML = this.template(this.data);
   }
 
   update() {
     this.render();
   }
 
-  useState(initialState) {
-    this.state = initialState;
-    return [this.state, (newState) => {
-      this.state = newState;
-      this.update();
-    }];
-  }
-
-  useEffect(callback, dependencies = []) {
-    if (!this.mounted) {
-      callback();
-      this.mounted = true;
-    } else {
-      const hasChangedDependencies = dependencies.some((dep, i) => dep !== this.state[`effect_${i}`]);
-      if (hasChangedDependencies) {
-        callback();
-        dependencies.forEach((dep, i) => {
-          this.state[`effect_${i}`] = dep;
-        });
-      }
-    }
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(callback);
-  }
-
-  trigger(event, ...args) {
-    if (this.events[event]) {
-      this.events[event].forEach(callback => callback(...args));
-    }
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.update();
   }
 
   template(data) {
@@ -62,16 +28,15 @@ class OComponent {
 }
 
 class ORouter {
-  constructor() {
+  constructor(o) {
+    this.o = o;
     this.routes = {};
     this.currentRoute = null;
-    this.onRouteChange = null;
-    this.basePath = '/';
     this.defaultRoute = null;
   }
 
-  route(fullPath, componentName) {
-    this.routes[this.basePath + fullPath] = componentName;
+  route(path, componentName) {
+    this.routes[path] = componentName;
   }
 
   setDefaultRoute(componentName) {
@@ -79,9 +44,8 @@ class ORouter {
   }
 
   navigate(path) {
-    const fullPath = this.basePath + path;
-    if (this.routes[fullPath]) {
-      this.currentRoute = this.routes[fullPath];
+    if (this.routes[path]) {
+      this.currentRoute = this.routes[path];
       this.renderComponent();
       this.updateURL(path);
     } else if (this.defaultRoute) {
@@ -96,16 +60,14 @@ class ORouter {
   renderComponent() {
     const componentName = this.currentRoute;
     const componentElement = document.getElementById('app');
-    const componentClass = o.components[componentName];
-    const component = new componentClass(componentElement, o.data);
+    const componentClass = this.o.components[componentName];
+    const component = new componentClass(componentElement, this.o.state);
     component.render();
   }
 
   updateURL(path) {
     try {
-      let url = new URL(window.location.href);
-      url.pathname = this.basePath + path;
-      window.history.pushState({}, '', url.toString());
+      window.history.pushState({}, '', path);
     } catch (error) {
       console.error('Error updating URL:', error);
       // Fallback logic, e.g., navigate to the default route
@@ -115,24 +77,32 @@ class ORouter {
 
   handleNotFound() {
     console.error('404 - Page not found');
-    this.trigger('404');
   }
 }
 
 class O {
   constructor() {
     this.components = {};
-    this.data = {};
-    this.router = new ORouter();
-    this.directives = {};
+    this.state = {};
+    this.router = new ORouter(this);
   }
 
   component(name, componentClass) {
     this.components[name] = componentClass;
   }
 
-  data(key, value) {
-    this.data[key] = value;
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.updateComponents();
+  }
+
+  updateComponents() {
+    for (const componentName in this.components) {
+      const componentElement = document.getElementById('app');
+      const componentClass = this.components[componentName];
+      const component = new componentClass(componentElement, this.state);
+      component.render();
+    }
   }
 
   route(path, componentName) {
@@ -143,36 +113,13 @@ class O {
     this.router.setDefaultRoute(componentName);
   }
 
-  navigate(fullPath) {
-    this.router.navigate(fullPath);
-  }
-
-  directive(name, directive) {
-    this.directives[name] = directive;
+  navigate(path) {
+    this.router.navigate(path);
   }
 
   mount(callback) {
     this.router.navigate(window.location.pathname);
     callback();
-  }
-
-  // Server-Side Rendering (SSR)
-  static renderToString(componentName, props) {
-    const componentClass = this.components[componentName];
-    const component = new componentClass(null, props);
-    return component.template(component.data);
-  }
-
-  // API Integration
-  static async fetch(url, options = {}) {
-    try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw error;
-    }
   }
 }
 

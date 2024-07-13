@@ -1,6 +1,6 @@
 {
   "name": "o-js-framework",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "o.js - A lightweight and modular JavaScript framework for building dynamic web applications. Designed with a focus on simplicity, flexibility, and performance.",
   "main": "src/o.js",
   "logo": "logo/o-js-logo.png",
