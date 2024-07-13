@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "o.js - A lightweight and modular JavaScript framework for building dynamic web applications. Designed with a focus on simplicity, flexibility, and performance.",
   "main": "src/o.js",
+  "logo": "logo/o-js-logo.png",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
