@@ -2,21 +2,8 @@
 <html>
 <head>
   <title>O.js Example</title>
-  <style>
-    .nav-link {
-      cursor: pointer;
-      text-decoration: underline;
-      color: blue;
-    }
-  </style>
 </head>
 <body>
-  <nav>
-    <a class="nav-link" data-route="">Home</a>
-    <a class="nav-link" data-route="about">About</a>
-    <a class="nav-link" data-route="contact">Contact</a>
-    <a class="nav-link" data-route="feedback">Feed Back</a>
-  </nav>
   <div id="app"></div>
 
   <script src="src/oo.js"></script>
@@ -51,42 +38,19 @@
       }
     }
 
-    class FeedBackComponent extends OComponent {
-      constructor(element) {
-        super(element);
-        this.data = {
-          title: 'Customer Feed Back',
-          content: 'This is my customer feedback page.'
-        };
-      }
-    }
-
     o.component('HomeComponent', HomeComponent);
     o.component('AboutComponent', AboutComponent);
     o.component('ContactComponent', ContactComponent);
-    o.component('FeedBackComponent', FeedBackComponent);
 
     o.route('', 'HomeComponent');
     o.route('about', 'AboutComponent');
     o.route('contact', 'ContactComponent');
-    o.route('feedback', 'FeedBackComponent');
 
     o.setDefaultRoute('HomeComponent');
 
     o.mount(() => {
       o.navigate('');
-
-      // Add event listeners to the navigation links
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-          const route = event.target.dataset.route;
-          o.navigate(route);
-          event.preventDefault();
-        });
-      });
     });
-
   </script>
 </body>
 </html>

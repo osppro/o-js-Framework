@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>O-JS Hello World</title>
+  <script src="src/o.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    class HelloComponent extends OComponent {
+      constructor(element, props) {
+        super(element, props);
+        this.data = { message: 'Hello, World!' };
+      }
+
+      template(data) {
+        return `
+          <h1>${data.message}</h1>
+        `;
+      }
+    }
+
+    o.component('home', HelloComponent);
+    o.route('/', 'home');
+    o.setDefaultRoute('home');
+
+    o.mount(() => {
+      console.log('Application started!');
+    });
+  </script>
+</body>
+</html>
