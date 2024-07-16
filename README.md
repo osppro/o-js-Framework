@@ -21,27 +21,31 @@ o.js is a minimalist JavaScript framework that empowers developers to build dyna
 Include the `o.js` file in your HTML:
 
 ### Usage
-
+### Creating Hello World in O.Js
 ```html
 <script src="https://cdn.jsdelivr.net/npm/o-js-framework"></script>
-Create your first component:
-// Create your first component
-class HomePage extends OComponent {
-  render() {
-    this.element.innerHTML = `
-      <h1>Welcome to the Home Page</h1>
-      <p>This is the content of the home page.</p>
-    `;
-  }
-}
 
-Define your routes and mount the application:
-const o = new O();
+// Create your first component 
+ class HelloComponent extends OComponent {
+      constructor(element, props) {
+        super(element, props);
+        this.data = { message: 'Hello, World!' };
+      }
 
-o.component('home-page', HomePage);
-o.route('/', 'home-page');
+      template(data) {
+        return `
+          <h1>${data.message}</h1>
+        `;
+      }
+    }
 
-o.mount();
+    o.component('home', HelloComponent);
+    o.route('/', 'home');
+    o.setDefaultRoute('home');
+
+    o.mount(() => {
+      console.log('Application started!');
+    });
 ```
 ### Server-Side Rendering (SSR)
 o.js supports server-side rendering (SSR) for improved initial load times and SEO. You can use the O.renderToString() method to render your components on the server:
